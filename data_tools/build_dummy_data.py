@@ -19,8 +19,8 @@ absl.app.flags.DEFINE_integer('num_shards', 1,
 def _create_dummy_dataset():
   """Create dummy dataset, and save it into tfrecord.
   """
-  image_np = np.arange(224 * 224 * 3).reshape((224, 224, 3)) % 225
-  annotation_np = image_np % 10
+  image_np = np.arange(224 * 224 * 3).reshape((224, 224, 3))
+  annotation_np = np.arange(224 * 224).reshape((224, 224, 1))
 
   for shard_id in range(FLAGS.num_shards):
     if FLAGS.num_shards == 1:
@@ -32,7 +32,7 @@ def _create_dummy_dataset():
     with tf.io.TFRecordWriter(output_filename) as writer:
       image_name = 'image_{}'.format(shard_id)
 
-      image_data = (image_np + shard_id) % 255
+      image_data = (image_np + shard_id) % 256
       image_data = tf.image.encode_png(image_data.astype(np.uint8))
       annotation_data = (annotation_np + shard_id) % 10
       annotation_data = tf.image.encode_png(annotation_data.astype(np.uint8))
